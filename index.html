@@ -138,39 +138,7 @@
     </div>
 
     <script>
-        async function hashPin(pin) {
-            const encoder = new TextEncoder();
-            const data = encoder.encode(pin);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-            return hashHex;
-        }
-
-        async function checkPIN() {
-            const pin = currentPIN;
-            const hashedPin = await hashPin(pin);
-
-            const response = await fetch('verify.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `hashed_pin=${hashedPin}`,
-            });
-
-            const result = await response.json();
-
-            if (result.status === 'success') {
-                document.getElementById('error-message').style.display = 'none';
-                protectedContent.classList.add('visible');
-            } else {
-                document.getElementById('error-message').style.display = 'block';
-                protectedContent.classList.remove('visible');
-                clearInput();
-            }
-        }
-
+        const correctPIN = "1031";
         const container = document.getElementById('container');
         const keypadContainer = document.getElementById('keypad');
         const pinBoxes = [document.getElementById('pinBox1'), document.getElementById('pinBox2'), document.getElementById('pinBox3'), document.getElementById('pinBox4')];
@@ -201,6 +169,19 @@
                     box.textContent = '';
                 }
             });
+        }
+
+        function checkPIN() {
+            const errorMessage = document.getElementById('error-message');
+
+            if (currentPIN === correctPIN) {
+                errorMessage.style.display = 'none';
+                protectedContent.classList.add('visible');
+            } else {
+                errorMessage.style.display = 'block';
+                protectedContent.classList.remove('visible');
+                clearInput();
+            }
         }
 
         function generateKeypad() {
